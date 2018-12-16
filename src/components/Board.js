@@ -2,28 +2,26 @@ import React from 'react';
 import { Square } from "./";
 
 export class Board extends React.Component {
-	renderSquare(i) {
-		return <Square value={this.props.squares[i]} onClick={() => this.props.onClick(i)} />;
+	renderSquare(x, y) {
+		return <Square value={this.props.squares[x][y]} onClick={() => this.props.onClick(x, y)} />;
 	}
-	
+
+	renderRow(i) {
+		return (
+			<div className="board-row">
+					{this.renderSquare(i, 0)}
+					{this.renderSquare(i, 1)}
+					{this.renderSquare(i, 2)}
+			</div>
+		);
+	}
+
 	render() {
 		return (
 			<div>
-				<div className="board-row">
-					{this.renderSquare(0)}
-					{this.renderSquare(1)}
-					{this.renderSquare(2)}
-				</div>
-				<div className="board-row">
-					{this.renderSquare(3)}
-					{this.renderSquare(4)}
-					{this.renderSquare(5)}
-				</div>
-				<div className="board-row">
-					{this.renderSquare(6)}
-					{this.renderSquare(7)}
-					{this.renderSquare(8)}
-				</div>
+				{this.renderRow(0)}
+				{this.renderRow(1)}
+				{this.renderRow(2)}
 			</div>
 		);
 	}
