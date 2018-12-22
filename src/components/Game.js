@@ -2,14 +2,14 @@ import React from 'react';
 import { Board } from "./";
 import { Square } from './Square';
 
-const x_size = 8, y_size = x_size;
+const BOARD_SIZE = {x: 8, y:8};
 
 export class Game extends React.Component {
 	constructor() {
 		super();
-		let board = new Array(x_size);
-		for(let y = 0; y < y_size; y++) {
-			board[y] = new Array(y_size).fill(null);
+		let board = new Array(BOARD_SIZE.x);
+		for(let y = 0; y < BOARD_SIZE.y; y++) {
+			board[y] = new Array(BOARD_SIZE.y).fill(null);
 		}
 		this.state = {
 			history: [{
@@ -27,18 +27,22 @@ export class Game extends React.Component {
 		if(board == current.board){
 			console.log("\n equal\n")
 		}
-		console.log(x, y);
-		console.log(board[0], board[1], board[2]);
+		console.log(x, y)
 		if (calculateWinner(board) || board[x][y]) {
 			return;
 		}
 		board[x][y] = this.state.xIsNext ? 'X' : 'O';
-		console.log(board[x][y]);
-		console.log(current.board)
-		console.log(board)
+		let next_board = updateBoard(board, x, y);
+		if (next_board == null){
+			next_board = board;
+			// return;
+		}
+		// console.log(board[x][y]);
+		// console.log(current.board)
+		// console.log(next_board)
 		this.setState({
 			history: history.concat([{
-				board: board.slice()
+				board: next_board.slice()
 			}]),
 			xIsNext: !this.state.xIsNext,
 			stepNumber: history.length
@@ -53,8 +57,8 @@ export class Game extends React.Component {
 	}
 
 	render() {
-		console.log(this.state.stepNumber)
-		console.log(this.state.history)
+		// console.log(this.state.stepNumber)
+		// console.log(this.state.history)
 		const history = this.state.history;
 		const current = history[this.state.stepNumber];
 		const winner = calculateWinner(current.board);
@@ -97,4 +101,51 @@ export class Game extends React.Component {
 function calculateWinner(board) {
 
 	return null;
+}
+
+const x_ways = [0, 0, 1, 1, 1, -1, -1, -1], y_ways = [1, -1, 0, 1, -1, 0, 1, -1];
+
+function updateSquare(board, x, y, player, way) {
+	if(x < 0 || y < 0 || x >= BOARD_SIZE.x || y >= BOARD_SIZE.y || board[x][y] == null){
+		return null;
+	}
+
+	if(board[x][y] == player){
+		return [];
+	}else{
+		let updated_squares = updateSquare(board, x + x_ways[way], y + y_ways[way], player, way);
+		if(updated_squares){
+			return updated_squares.concat({x: x, y: y});
+		}else{
+			return null;
+		}
+	}
+}
+
+function updateBoard(board, x, y) {
+	const player = board[x][y];
+	let updated_squares_allways = [];
+	
+	for(let i = 0; i < x_ways.length; i++){
+		let updated_squares = updateSquare(board, x + x_ways[i], y + y_ways[i], player, i);
+		if(updated_squares){
+			updated_squares_allways = updated_squares_allways.concat(updated_squares);
+			console.log(updated_squares)
+		}
+	}
+	console.log(updated_squares_allways)
+	console.log(updated_squares_allways.length)
+	
+
+	if(updated_squares_allways.length == 0){
+		console.log("updated_squares_allways is null")
+		return null;
+	}
+
+	let updated_board = board.slice();
+	updated_squares_allways.forEach((value) => {
+		updated_board[value.x][value.y] = player;
+	});
+	
+	return updated_board;
 }
