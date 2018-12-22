@@ -1,18 +1,19 @@
 import React from 'react';
 import { Board } from "./";
+import { Square } from './Square';
 
-const xSize = 3, ySize = xSize;
+const x_size = 8, y_size = x_size;
 
 export class Game extends React.Component {
 	constructor() {
 		super();
-		let squares = new Array(xSize);
-		for(let y = 0; y < xSize; y++) {
-			squares[y] = new Array(ySize).fill(null);
+		let board = new Array(x_size);
+		for(let y = 0; y < y_size; y++) {
+			board[y] = new Array(y_size).fill(null);
 		}
 		this.state = {
 			history: [{
-				squares: squares
+				board: board
 			}],
 			xIsNext: true,
 			stepNumber: 0
@@ -22,22 +23,22 @@ export class Game extends React.Component {
 	handleClick(x, y) {
 		const history = this.state.history.slice(0, this.state.stepNumber + 1);
 		const current = history[history.length - 1];
-		const squares = current.squares.slice();
-		if(squares == current.squares){
+		const board = current.board.slice();
+		if(board == current.board){
 			console.log("\n equal\n")
 		}
 		console.log(x, y);
-		console.log(squares[0], squares[1], squares[2]);
-		if (calculateWinner(squares) || squares[x][y]) {
+		console.log(board[0], board[1], board[2]);
+		if (calculateWinner(board) || board[x][y]) {
 			return;
 		}
-		squares[x][y] = this.state.xIsNext ? 'X' : 'O';
-		console.log(squares[x][y]);
-		console.log(current.squares)
-		console.log(squares)
+		board[x][y] = this.state.xIsNext ? 'X' : 'O';
+		console.log(board[x][y]);
+		console.log(current.board)
+		console.log(board)
 		this.setState({
 			history: history.concat([{
-				squares: squares.slice()
+				board: board.slice()
 			}]),
 			xIsNext: !this.state.xIsNext,
 			stepNumber: history.length
@@ -56,7 +57,7 @@ export class Game extends React.Component {
 		console.log(this.state.history)
 		const history = this.state.history;
 		const current = history[this.state.stepNumber];
-		const winner = calculateWinner(current.squares);
+		const winner = calculateWinner(current.board);
 
 		let status;
 		if (winner) {
@@ -80,7 +81,7 @@ export class Game extends React.Component {
 			<div className="game">
 				<div className="game-board">
 					<Board
-						squares={current.squares}
+						board={current.board}
 						onClick={(x, y) => this.handleClick(x, y)}
 					/>
 				</div>
@@ -93,7 +94,7 @@ export class Game extends React.Component {
 	}
 }
 
-function calculateWinner(squares) {
+function calculateWinner(board) {
 
 	return null;
 }

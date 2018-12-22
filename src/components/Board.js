@@ -3,7 +3,7 @@ import { Square } from "./";
 
 export class Board extends React.Component {
 	renderSquare(x, y) {
-		return <Square value={this.props.squares[x][y]} onClick={() => this.props.onClick(x, y)} />;
+		return <Square value={this.props.board[x][y]} onClick={() => this.props.onClick(x, y)} />;
 	}
 
 	renderRow(i) {
