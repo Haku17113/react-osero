@@ -3,27 +3,40 @@ import { Board } from "./";
 import { Square } from './Square';
 
 const BOARD_SIZE = {x: 8, y:8};
+const PLAYER = {x: 'X', o: 'O'};
 
 export class Game extends React.Component {
 	constructor() {
 		super();
-		let board = new Array(BOARD_SIZE.x);
-		for(let y = 0; y < BOARD_SIZE.y; y++) {
-			board[y] = new Array(BOARD_SIZE.y).fill(null);
-		}
 		this.state = {
 			history: [{
-				board: board
+				board: this.initBoard()
 			}],
 			xIsNext: true,
 			stepNumber: 0
 		};
 	}
+
+	initBoard(){
+		let board = new Array(BOARD_SIZE.x);
+		for(let y = 0; y < BOARD_SIZE.y; y++) {
+			board[y] = new Array(BOARD_SIZE.y).fill(null);
+		}
+
+		board[BOARD_SIZE.x / 2][BOARD_SIZE.y / 2] = PLAYER.x;
+		board[BOARD_SIZE.x / 2][BOARD_SIZE.y / 2 - 1] = PLAYER.o;
+		board[BOARD_SIZE.x / 2 - 1][BOARD_SIZE.y / 2] = PLAYER.o;
+		board[BOARD_SIZE.x / 2 - 1][BOARD_SIZE.y / 2 - 1] = PLAYER.x;
+
+		console.log(board)
+
+		return board;
+	}
 	
 	handleClick(x, y) {
 		const history = this.state.history.slice(0, this.state.stepNumber + 1);
 		const current = history[history.length - 1];
-		const board = current.board.slice();
+		const board = current.board.concat();
 		if(board == current.board){
 			console.log("\n equal\n")
 		}
@@ -31,18 +44,18 @@ export class Game extends React.Component {
 		if (calculateWinner(board) || board[x][y]) {
 			return;
 		}
-		board[x][y] = this.state.xIsNext ? 'X' : 'O';
+		board[x][y] = this.state.xIsNext ? PLAYER.x : PLAYER.o;
 		let next_board = updateBoard(board, x, y);
 		if (next_board == null){
-			next_board = board;
-			// return;
+			board[x][y] = null;
+			return;
 		}
 		// console.log(board[x][y]);
 		// console.log(current.board)
 		// console.log(next_board)
 		this.setState({
 			history: history.concat([{
-				board: next_board.slice()
+				board: next_board
 			}]),
 			xIsNext: !this.state.xIsNext,
 			stepNumber: history.length
@@ -67,7 +80,7 @@ export class Game extends React.Component {
 		if (winner) {
 			status = 'Winner: ' + winner;
 		} else {
-			status = 'Next player: ' + (this.state.xIsNext ? 'X' : 'O');
+			status = 'Next player: ' + (this.state.xIsNext ? PLAYER.x : PLAYER.o);
 		}
 
 		const moves = history.map((step, move) => {
@@ -143,7 +156,7 @@ function updateBoard(board, x, y) {
 		return null;
 	}
 
-	let updated_board = board.slice();
+	let updated_board = board.concat();
 	updated_squares_allways.forEach((value) => {
 		updated_board[value.x][value.y] = player;
 	});
