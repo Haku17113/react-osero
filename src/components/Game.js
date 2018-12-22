@@ -80,6 +80,7 @@ export class Game extends React.Component {
 				</li>
 			);
 		});
+		console.log(moves)
 
 		return (
 			<div className="game">
@@ -87,6 +88,7 @@ export class Game extends React.Component {
 					<Board
 						board={current.board}
 						onClick={(x, y) => this.handleClick(x, y)}
+						BOARD_SIZE = {BOARD_SIZE}
 					/>
 				</div>
 				<div className="game-info">
@@ -135,7 +137,6 @@ function updateBoard(board, x, y) {
 	}
 	console.log(updated_squares_allways)
 	console.log(updated_squares_allways.length)
-	
 
 	if(updated_squares_allways.length == 0){
 		console.log("updated_squares_allways is null")
