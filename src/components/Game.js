@@ -1,4 +1,5 @@
 import React from 'react';
+import _ from 'lodash';
 import { Board } from "./";
 import { Square } from './Square';
 
@@ -36,23 +37,18 @@ export class Game extends React.Component {
 	handleClick(x, y) {
 		const history = this.state.history.slice(0, this.state.stepNumber + 1);
 		const current = history[history.length - 1];
-		const board = current.board.concat();
-		if(board == current.board){
-			console.log("\n equal\n")
-		}
-		console.log(x, y)
+		const board = _.cloneDeep(current.board);
+
 		if (calculateWinner(board) || board[x][y]) {
 			return;
 		}
-		board[x][y] = this.state.xIsNext ? PLAYER.x : PLAYER.o;
-		let next_board = updateBoard(board, x, y);
+
+		const player = this.state.xIsNext ? PLAYER.x : PLAYER.o;
+		let next_board = updateBoard(board, x, y, player);
 		if (next_board == null){
-			board[x][y] = null;
 			return;
 		}
-		// console.log(board[x][y]);
-		// console.log(current.board)
-		// console.log(next_board)
+
 		this.setState({
 			history: history.concat([{
 				board: next_board
@@ -63,10 +59,10 @@ export class Game extends React.Component {
 	}
 
 	jumpTo(step) {
-		// this.setState({
-		// 	stepNumber: step,
-		// 	xIsNext: (step % 2) ? false : true,
-		// });
+		this.setState({
+			stepNumber: step,
+			xIsNext: (step % 2) ? false : true,
+		});
 	}
 
 	render() {
@@ -118,7 +114,7 @@ function calculateWinner(board) {
 	return null;
 }
 
-const x_ways = [0, 0, 1, 1, 1, -1, -1, -1], y_ways = [1, -1, 0, 1, -1, 0, 1, -1];
+const ways={length: 8, x: [0, 0, 1, 1, 1, -1, -1, -1], y: [1, -1, 0, 1, -1, 0, 1, -1]};
 
 function updateSquare(board, x, y, player, way) {
 	if(x < 0 || y < 0 || x >= BOARD_SIZE.x || y >= BOARD_SIZE.y || board[x][y] == null){
@@ -128,7 +124,7 @@ function updateSquare(board, x, y, player, way) {
 	if(board[x][y] == player){
 		return [];
 	}else{
-		let updated_squares = updateSquare(board, x + x_ways[way], y + y_ways[way], player, way);
+		let updated_squares = updateSquare(board, x + ways.x[way], y + ways.y[way], player, way);
 		if(updated_squares){
 			return updated_squares.concat({x: x, y: y});
 		}else{
@@ -137,12 +133,13 @@ function updateSquare(board, x, y, player, way) {
 	}
 }
 
-function updateBoard(board, x, y) {
-	const player = board[x][y];
+function updateBoard(board_origin, x, y, player) {
+	let board = _.cloneDeep(board_origin);
+	board[x][y] = player;
 	let updated_squares_allways = [];
 	
-	for(let i = 0; i < x_ways.length; i++){
-		let updated_squares = updateSquare(board, x + x_ways[i], y + y_ways[i], player, i);
+	for(let i = 0; i < ways.length; i++){
+		let updated_squares = updateSquare(board, x + ways.x[i], y + ways.y[i], player, i);
 		if(updated_squares){
 			updated_squares_allways = updated_squares_allways.concat(updated_squares);
 			console.log(updated_squares)
@@ -153,10 +150,11 @@ function updateBoard(board, x, y) {
 
 	if(updated_squares_allways.length == 0){
 		console.log("updated_squares_allways is null")
+		board[x][y] = null;
 		return null;
 	}
 
-	let updated_board = board.concat();
+	let updated_board = _.cloneDeep(board);
 	updated_squares_allways.forEach((value) => {
 		updated_board[value.x][value.y] = player;
 	});
