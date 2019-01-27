@@ -15,7 +15,7 @@ export class Game extends React.Component {
 		this.state = {
 			history: [{
 				board: board,
-				next_boards: next_boards
+				nextBoards: next_boards
 			}],
 			xIsNext: true,
 			stepNumber: 0
@@ -42,7 +42,7 @@ export class Game extends React.Component {
 		this.setState({
 			history: history.concat([{
 				board: next_board,
-				next_boards: next_boards
+				nextBoards: next_boards
 			}]),
 			xIsNext: !this.state.xIsNext,
 			stepNumber: history.length
@@ -81,7 +81,7 @@ export class Game extends React.Component {
 		console.log(moves)
 
 		let board = _.cloneDeep(current.board);
-		current.next_boards.forEach((value) => {
+		current.nextBoards.forEach((value) => {
 			board[value.x][value.y] = NEXT;
 		});
 
