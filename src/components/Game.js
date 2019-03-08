@@ -1,7 +1,6 @@
 import React from 'react';
 import _ from 'lodash';
 import { Board } from "./";
-import { Square } from './Square';
 
 const BOARD_SIZE = {x: 8, y:8};
 const PLAYER = {x: 'X', o: 'O'};
@@ -15,9 +14,9 @@ export class Game extends React.Component {
 		this.state = {
 			history: [{
 				board: board,
+				xIsNext: true,
 				nextBoards: next_boards
 			}],
-			xIsNext: true,
 			stepNumber: 0
 		};
 	}
@@ -31,20 +30,20 @@ export class Game extends React.Component {
 			return;
 		}
 
-		const player = this.state.xIsNext ? PLAYER.x : PLAYER.o;
+		const player = current.xIsNext ? PLAYER.x : PLAYER.o;
 
 		let next_board = getNextBoard(board, x, y, player);
 		if (next_board == null){
 			return;
 		}
-		let next_boards = getNextBoards(next_board, !this.state.xIsNext ? PLAYER.x : PLAYER.o);
+		let next_boards = getNextBoards(next_board, !current.xIsNext ? PLAYER.x : PLAYER.o);
 
 		this.setState({
 			history: history.concat([{
 				board: next_board,
+				xIsNext: !current.xIsNext,
 				nextBoards: next_boards
 			}]),
-			xIsNext: !this.state.xIsNext,
 			stepNumber: history.length
 		});
 	}
@@ -52,7 +51,6 @@ export class Game extends React.Component {
 	jumpTo(step) {
 		this.setState({
 			stepNumber: step,
-			xIsNext: (step % 2) ? false : true,
 		});
 	}
 
@@ -65,7 +63,7 @@ export class Game extends React.Component {
 		if (winner) {
 			status = 'Winner: ' + winner;
 		} else {
-			status = 'Next player: ' + (this.state.xIsNext ? PLAYER.x : PLAYER.o);
+			status = 'Next player: ' + (current.xIsNext ? PLAYER.x : PLAYER.o);
 		}
 
 		const moves = history.map((step, move) => {
