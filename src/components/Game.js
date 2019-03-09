@@ -2,7 +2,7 @@ import React from 'react';
 import _ from 'lodash';
 import { Board } from "./";
 
-const BOARD_SIZE = {x: 8, y:8};
+const BOARD_SIZE = {x: 4, y:4};
 const PLAYER = {x: 'X', o: 'O'};
 const NEXT = 'I';
 
@@ -36,14 +36,14 @@ export class Game extends React.Component {
 		if (next_board == null){
 			return;
 		}
-		let next_boards = getNextBoards(next_board, !current.xIsNext ? PLAYER.x : PLAYER.o);
+
+		let next = getNext(next_board, current.xIsNext);
+		if(next == null){
+			// this.finsh();
+		}
 
 		this.setState({
-			history: history.concat([{
-				board: next_board,
-				xIsNext: !current.xIsNext,
-				nextBoards: next_boards
-			}]),
+			history: history.concat([next]),
 			stepNumber: history.length
 		});
 	}
@@ -120,6 +120,26 @@ function initBoard() {
 function calculateWinner(board) {
 
 	return null;
+}
+
+function getNext(next_board, xIsNext){
+	let next_xIsNext = !xIsNext;
+	let next_boards = getNextBoards(next_board, next_xIsNext ? PLAYER.x : PLAYER.o);
+
+	if(next_boards.length == 0){
+		next_xIsNext = !next_xIsNext;
+		next_boards = getNextBoards(next_board, next_xIsNext ? PLAYER.x : PLAYER.o);
+	}
+
+	if(next_boards.length == 0){
+		return null;
+	}
+
+	return {
+		board: next_board,
+		xIsNext: next_xIsNext,
+		nextBoards: next_boards
+	};
 }
 
 function getNextBoards(board, player){
